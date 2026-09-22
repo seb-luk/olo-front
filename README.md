@@ -49,9 +49,9 @@ Copy and paste this snippet into an `index.html` file and serve it with any HTTP
     <button data-olo-name="incrementBtn">+1</button>
   </section>
 
-  <!-- Import directly via native ESM (or from node_modules) -->
+  <!-- Import directly via native ESM from CDN (or from 'olo-front' if using a bundler) -->
   <script type="module">
-    import { Component, Elements, State } from 'olo-front';
+    import { Component, Elements, State } from 'https://esm.sh/olo-front';
 
     class CounterComponent extends Component {
       constructor(rootElement) {
@@ -106,16 +106,20 @@ npm install olo-front
 import { Component, State, Elements, Events } from 'olo-front';
 ```
 
-### 2. Native Browser ESM (Buildless)
+### 2. Native Browser ESM (Buildless CDN)
 ```html
 <script type="module">
-  import { Component, State } from '/path/to/olo-front/src/index.js';
+  import { Component, State, Elements, Events } from 'https://esm.sh/olo-front';
+  // Or via jsDelivr:
+  // import { Component, State, Elements, Events } from 'https://cdn.jsdelivr.net/npm/olo-front/+esm';
 </script>
 ```
 
-### 3. Direct Script Tag (UMD)
+### 3. Direct Script Tag (UMD CDN)
 ```html
-<script src="./dist/index.umd.cjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/olo-front/dist/index.umd.cjs"></script>
+<!-- Or via unpkg: -->
+<!-- <script src="https://unpkg.com/olo-front/dist/index.umd.cjs"></script> -->
 <script>
   const { Component, State, Elements, Events } = window.OloFront;
 </script>

@@ -24,25 +24,27 @@ import { Component, State, Elements, Events } from 'olo-front';
 
 ---
 
-### Option B: Native Browser ESM (No Build Step Required)
+### Option B: Native Browser ESM (Buildless CDN)
 
-Because `olo-front` is written in standard ES modules, you can serve or import it directly in any modern browser without a bundler or node_modules:
+Because `olo-front` is written in standard ES modules, you can import it directly from a CDN in any modern browser without a bundler or node_modules:
 
 ```html
 <script type="module">
-  import { Component, State, Elements } from './packages/olo-front/src/index.js';
-  // Directly runnable code
+  import { Component, State, Elements, Events } from 'https://esm.sh/olo-front';
+  // or via jsDelivr:
+  // import { Component, State, Elements, Events } from 'https://cdn.jsdelivr.net/npm/olo-front/+esm';
 </script>
 ```
 
 ---
 
-### Option C: Standalone UMD Script Tag
+### Option C: Standalone UMD Script Tag (CDN)
 
-If you prefer classic script tags (for CMS templates, static HTML, or legacy setups), include the UMD bundle. Everything is attached to `window.OloFront`:
+If you prefer classic script tags (for CMS templates, static HTML, or legacy setups), include the UMD bundle from a CDN. Everything is attached to `window.OloFront`:
 
 ```html
-<script src="https://unpkg.com/olo-front/dist/index.umd.cjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/olo-front/dist/index.umd.cjs"></script>
+<!-- or via unpkg: <script src="https://unpkg.com/olo-front/dist/index.umd.cjs"></script> -->
 <script>
   const { Component, State, Elements, Events } = window.OloFront;
 </script>

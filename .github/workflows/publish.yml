@@ -31,13 +31,6 @@ jobs:
       - name: Build package
         run: npm run build
 
-      - name: Publish to NPM
-        run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            npm publish --provenance --access public
-          else
-            npm publish --access public
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to NPM with Provenance
+        run: npm publish --provenance --access public
 

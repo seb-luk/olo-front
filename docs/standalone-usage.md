@@ -7,6 +7,14 @@ Several primitives offer tremendous value when used completely standalone in:
 - Server-rendered frameworks (Django, Ruby on Rails, Laravel, ASP.NET)
 - Modern lightweight stacks (HTMX, Alpine.js, Astro, 11ty)
 
+> [!TIP]
+> In buildless setups, HTML templates, or server-rendered apps, you can import standalone modules directly via CDN:
+> ```html
+> <script type="module">
+>   import { Events, Mode, Elements } from 'https://esm.sh/olo-front';
+> </script>
+> ```
+
 ---
 
 ## 1. Standalone `Events`: Leak-Free Listener Management
