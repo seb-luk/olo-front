@@ -15,55 +15,18 @@
   "type": "module",
   "sideEffects": false,
   "files": [
-    "index.js",
-    "index.js.map",
-    "index.umd.cjs",
-    "index.umd.cjs.map",
-    "index.d.ts",
-    "lib",
+    "dist",
     "README.md"
   ],
-  "main": "./index.umd.cjs",
-  "module": "./index.js",
-  "types": "./index.d.ts",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./index.umd.cjs",
-      "default": "./index.js"
-    },
-    "./state": {
-      "types": "./lib/state.d.ts",
-      "import": "./lib/state.js"
-    },
-    "./router": {
-      "types": "./lib/router.d.ts",
-      "import": "./lib/router.js"
-    },
-    "./view": {
-      "types": "./lib/view.d.ts",
-      "import": "./lib/view.js"
-    },
-    "./elements": {
-      "types": "./lib/elements.d.ts",
-      "import": "./lib/elements.js"
-    },
-    "./component": {
-      "types": "./lib/component.d.ts",
-      "import": "./lib/component.js"
-    },
-    "./events": {
-      "types": "./lib/events.d.ts",
-      "import": "./lib/events.js"
-    },
-    "./meta": {
-      "types": "./lib/meta.d.ts",
-      "import": "./lib/meta.js"
-    },
-    "./builder": {
-      "types": "./lib/component-builder.d.ts",
-      "import": "./lib/component-builder.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs",
+      "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
