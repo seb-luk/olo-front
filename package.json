@@ -1,0 +1,96 @@
+{
+  "name": "olo-front",
+  "version": "0.0.1",
+  "description": "Lightweight, zero-dependency vanilla JS frontend framework",
+  "license": "MIT",
+  "author": "Sebastian Luksic",
+  "keywords": [
+    "vanilla",
+    "frontend-framework",
+    "reactive",
+    "router",
+    "zero-dependencies",
+    "dom"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "index.js",
+    "index.js.map",
+    "index.umd.cjs",
+    "index.umd.cjs.map",
+    "index.d.ts",
+    "lib",
+    "README.md"
+  ],
+  "main": "./index.umd.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.umd.cjs",
+      "default": "./index.js"
+    },
+    "./state": {
+      "types": "./lib/state.d.ts",
+      "import": "./lib/state.js"
+    },
+    "./router": {
+      "types": "./lib/router.d.ts",
+      "import": "./lib/router.js"
+    },
+    "./view": {
+      "types": "./lib/view.d.ts",
+      "import": "./lib/view.js"
+    },
+    "./elements": {
+      "types": "./lib/elements.d.ts",
+      "import": "./lib/elements.js"
+    },
+    "./component": {
+      "types": "./lib/component.d.ts",
+      "import": "./lib/component.js"
+    },
+    "./events": {
+      "types": "./lib/events.d.ts",
+      "import": "./lib/events.js"
+    },
+    "./meta": {
+      "types": "./lib/meta.d.ts",
+      "import": "./lib/meta.js"
+    },
+    "./builder": {
+      "types": "./lib/component-builder.d.ts",
+      "import": "./lib/component-builder.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seb-luk/olo-front.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seb-luk/olo-front/issues"
+  },
+  "homepage": "https://github.com/seb-luk/olo-front#readme",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "~4.1.0",
+    "happy-dom": "^20.14.5",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.0",
+    "vite-plugin-dts": "~4.5.0",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {}
+}
