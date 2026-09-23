@@ -14,7 +14,6 @@ import { Module } from './module.js';
  *  StateConfig,
  *  StateOptions,
  *  ModuleDependencies,
- *  ModuleOptions,
  *  ModeModule,
  *  Effect,
  *  StateContent,
