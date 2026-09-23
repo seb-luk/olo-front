@@ -247,7 +247,7 @@ export class Component extends Module {
    *
    * @param {EventListenerConfig | string | HTMLElement | Window} [target] - Target element, data-olo-name string, event name, or config object.
    * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - Event name or callback function.
-   * @param {((this: Element, ev: Event) => any)} [callback] - Event callback function.
+   * @param {((this: Element, ev: Event) => any) | EventOptions} [callback] - Event callback function or listener options.
    * @param {EventOptions} [options] - Additional listener options.
    * @returns {HTMLElement | Window | undefined} The target element the listener was attached to.
    */
@@ -266,7 +266,7 @@ export class Component extends Module {
    *
    * @param {EventListenerConfig | string | HTMLElement | Window} [target] - Target element, data-olo-name string, event name, or config object.
    * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - Event name or callback function.
-   * @param {((this: Element, ev: Event) => any)} [callback] - Event callback function.
+   * @param {((this: Element, ev: Event) => any) | EventOptions} [callback] - Event callback function or listener options.
    * @param {EventOptions} [options] - Additional listener options.
    * @returns {HTMLElement | Window | undefined} The target element the listener was removed from.
    */

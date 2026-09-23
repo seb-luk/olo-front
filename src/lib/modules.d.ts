@@ -536,24 +536,56 @@ export interface ComponentModule extends Selector, Module {
   /**
    * Adds an event listener within the component's scope via the Events module.
    * Proxies to this.events.listen with automatic lifecycle teardown on destroy.
+   *
+   * Supports:
+   * - `this.on('incrementBtn', 'click', (e) => ...)`
+   * - `this.on('click', (e) => ...)` (listens on component root element)
+   * - `this.on({ target: 'incrementBtn', event: 'click', callback: (e) => ... })`
+   *
+   * @param target - Target element, data-olo-name string, event name, or config object.
+   * @param eventOrCallback - Event name or callback function.
+   * @param callback - Event callback if positional arguments are used.
+   * @param options - Additional listener options.
+   * @returns The target element or window the listener was attached to.
    */
-  on?: (
-    target?: EventListenerConfig | string | HTMLElement | Window,
-    eventOrCallback?: string | ((this: Element, ev: Event) => any),
-    callback?: ((this: Element, ev: Event) => any),
-    options?: EventOptions,
-  ) => HTMLElement | Window | undefined;
+  on?: {
+    (config: EventListenerConfig): HTMLElement | Window | undefined;
+    (event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window | undefined;
+    (target: string | HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window | undefined;
+    (
+      target?: EventListenerConfig | string | HTMLElement | Window,
+      eventOrCallback?: string | ((this: Element, ev: Event) => any),
+      callback?: ((this: Element, ev: Event) => any),
+      options?: EventOptions,
+    ): HTMLElement | Window | undefined;
+  };
 
   /**
    * Removes an event listener from a target element within the component's scope.
    * Proxies to this.events.unlisten.
+   *
+   * Supports:
+   * - `this.off('incrementBtn', 'click', fn)`
+   * - `this.off('click', fn)` (removes from component root element)
+   * - `this.off({ target: 'incrementBtn', event: 'click', callback: fn })`
+   *
+   * @param target - Target element, data-olo-name string, event name, or config object.
+   * @param eventOrCallback - Event name or callback function.
+   * @param callback - Event callback if positional arguments are used.
+   * @param options - Additional listener options.
+   * @returns The target element or window the listener was removed from.
    */
-  off?: (
-    target?: EventListenerConfig | string | HTMLElement | Window,
-    eventOrCallback?: string | ((this: Element, ev: Event) => any),
-    callback?: ((this: Element, ev: Event) => any),
-    options?: EventOptions,
-  ) => HTMLElement | Window | undefined;
+  off?: {
+    (config: EventListenerConfig): HTMLElement | Window | undefined;
+    (event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window | undefined;
+    (target: string | HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window | undefined;
+    (
+      target?: EventListenerConfig | string | HTMLElement | Window,
+      eventOrCallback?: string | ((this: Element, ev: Event) => any),
+      callback?: ((this: Element, ev: Event) => any),
+      options?: EventOptions,
+    ): HTMLElement | Window | undefined;
+  };
 
   /** Lifecycle hook invoked after the component is mounted in the DOM. */
   onReady: () => void | Promise<void>;
@@ -589,8 +621,8 @@ export interface EventOptions {
  * Configuration object defining a DOM event listener.
  */
 export interface EventListenerConfig {
-  /** Target element, window, or selector. Defaults to the events module scope. */
-  target?: Selector | HTMLElement | Window;
+  /** Target element, window, selector, or data-olo-name string. Defaults to the events module scope. */
+  target?: Selector | HTMLElement | Window | string;
   /** Event type name (e.g. 'click', 'oloEvent'). Defaults to 'oloEvent'. */
   event?: string;
   /** Callback invoked when the event is triggered. */
@@ -606,34 +638,56 @@ export interface EventsModule extends ViewModule {
   /**
    * Attaches an event listener to the target element.
    * Supports positional arguments `(target, event, callback, options)` or config object.
+   *
+   * Supports:
+   * - `this.events.listen('incrementBtn', 'click', (e) => ...)`
+   * - `this.events.listen('click', (e) => ...)` (listens on scope root)
+   * - `this.events.listen({ target: 'incrementBtn', event: 'click', callback: (e) => ... })`
+   *
    * @param configOrTarget - Event listener configuration, target element, selector name, or event name.
    * @param eventOrCallback - Event name or callback function.
    * @param callback - Event callback if positional arguments are used.
    * @param options - Additional listener options.
    * @returns The target element or window the listener was attached to.
    */
-  listen?: (
-    configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
-    eventOrCallback?: string | ((this: Element, ev: Event) => any),
-    callback?: ((this: Element, ev: Event) => any),
-    options?: EventOptions,
-  ) => HTMLElement | Window;
+  listen?: {
+    (config: EventListenerConfig): HTMLElement | Window;
+    (event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window;
+    (target: string | HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window;
+    (
+      configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
+      eventOrCallback?: string | ((this: Element, ev: Event) => any),
+      callback?: ((this: Element, ev: Event) => any),
+      options?: EventOptions,
+    ): HTMLElement | Window;
+  };
 
   /**
    * Removes an event listener from its target element.
    * Supports positional arguments `(target, event, callback, options)` or config object.
+   *
+   * Supports:
+   * - `this.events.unlisten('incrementBtn', 'click', fn)`
+   * - `this.events.unlisten('click', fn)` (removes from scope root)
+   * - `this.events.unlisten({ target: 'incrementBtn', event: 'click', callback: fn })`
+   *
    * @param configOrTarget - Event listener configuration, target element, selector name, or event name.
    * @param eventOrCallback - Event name or callback function.
    * @param callback - Event callback if positional arguments are used.
    * @param options - Additional listener options.
    * @returns The target element or window the listener was removed from.
    */
-  unlisten?: (
-    configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
-    eventOrCallback?: string | ((this: Element, ev: Event) => any),
-    callback?: ((this: Element, ev: Event) => any),
-    options?: EventOptions,
-  ) => HTMLElement | Window;
+  unlisten?: {
+    (config: EventListenerConfig): HTMLElement | Window;
+    (event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window;
+    (target: string | HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options?: EventOptions): HTMLElement | Window;
+    (
+      configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
+      eventOrCallback?: string | ((this: Element, ev: Event) => any),
+      callback?: ((this: Element, ev: Event) => any),
+      options?: EventOptions,
+    ): HTMLElement | Window;
+  };
 
   /** Aborts and removes all event listeners registered through this instance. */
   stopAll?: () => void;

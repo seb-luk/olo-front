@@ -107,13 +107,13 @@ export class Events extends View {
 
     listeners
       ?.map((listener) => {
-        if (listener.target instanceof HTMLElement) {
+        if (listener.target instanceof HTMLElement || listener.target === window) {
           return listener;
         }
 
         return {
           ...listener,
-          target: this.compileSelector(listener.target),
+          target: this.compileSelector(/** @type {any} */ (listener.target)),
         };
       })
       .forEach((listener) => { this.listen(listener); });
@@ -124,7 +124,7 @@ export class Events extends View {
    * Supports both positional arguments `(target, event, callback, options)` and single object argument `{ target, event, callback, options }`.
    * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
    * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
-   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {((this: Element, ev: Event) => any) | EventOptions} [callback] - The event callback if positional arguments are used.
    * @param {EventOptions} [options] - Additional listener options.
    * @returns {{ target: HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options: EventOptions }} The compiled and normalized event listener configuration.
    */
@@ -181,7 +181,7 @@ export class Events extends View {
    * Adds an event listener to a target element.
    * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
    * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
-   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {((this: Element, ev: Event) => any) | EventOptions} [callback] - The event callback if positional arguments are used.
    * @param {EventOptions} [options] - Additional options.
    * @returns {HTMLElement | Window} The target element the listener was attached to.
    */
@@ -201,7 +201,7 @@ export class Events extends View {
    * Removes an event listener from a target element.
    * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
    * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
-   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {((this: Element, ev: Event) => any) | EventOptions} [callback] - The event callback if positional arguments are used.
    * @param {EventOptions} [options] - Additional options.
    * @returns {HTMLElement | Window} The target element the listener was removed from.
    */
