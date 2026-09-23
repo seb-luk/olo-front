@@ -9,6 +9,8 @@ import { Module } from './module.js';
  *  ComponentModule,
  *  ComponentOptions,
  *  ElementsModule,
+ *  EventListenerConfig,
+ *  EventOptions,
  *  EventsModule,
  *  ModuleDependencies,
  *  RouterModule,
@@ -225,7 +227,56 @@ export class Component extends Module {
    * @returns {EventsModule | undefined} The events module.
    */
   get events() {
+    if (!this.#events && this.dependencies.Events) {
+      this.#events = new this.dependencies.Events(this.options, this.dependencies);
+      if (this.rootElement) {
+        this.#events.scope = this.rootElement;
+      }
+    }
     return this.#events;
+  }
+
+  /**
+   * Adds an event listener within the component's scope via the Events module.
+   * Proxies to this.events.listen with automatic lifecycle teardown on destroy.
+   *
+   * @example
+   * this.on('incrementBtn', 'click', () => this.increment());
+   * this.on('click', (e) => this.handleClick(e));
+   * this.on({ target: 'btn', event: 'click', callback: () => {} });
+   *
+   * @param {EventListenerConfig | string | HTMLElement | Window} [target] - Target element, data-olo-name string, event name, or config object.
+   * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - Event name or callback function.
+   * @param {((this: Element, ev: Event) => any)} [callback] - Event callback function.
+   * @param {EventOptions} [options] - Additional listener options.
+   * @returns {HTMLElement | Window | undefined} The target element the listener was attached to.
+   */
+  on(target, eventOrCallback, callback, options) {
+    return this.events?.listen?.(
+      /** @type {any} */ (target),
+      /** @type {any} */ (eventOrCallback),
+      /** @type {any} */ (callback),
+      options,
+    );
+  }
+
+  /**
+   * Removes an event listener from a target element within the component's scope.
+   * Proxies to this.events.unlisten.
+   *
+   * @param {EventListenerConfig | string | HTMLElement | Window} [target] - Target element, data-olo-name string, event name, or config object.
+   * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - Event name or callback function.
+   * @param {((this: Element, ev: Event) => any)} [callback] - Event callback function.
+   * @param {EventOptions} [options] - Additional listener options.
+   * @returns {HTMLElement | Window | undefined} The target element the listener was removed from.
+   */
+  off(target, eventOrCallback, callback, options) {
+    return this.events?.unlisten?.(
+      /** @type {any} */ (target),
+      /** @type {any} */ (eventOrCallback),
+      /** @type {any} */ (callback),
+      options,
+    );
   }
 
   /**

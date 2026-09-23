@@ -15,6 +15,7 @@ import { View } from './view.js';
  *  EventsOptions,
  *  ModuleDependencies,
  *  ModuleOptions,
+ *  Selector,
  *  StateProperties,
  * } from './modules.d.ts';
  */
@@ -120,25 +121,72 @@ export class Events extends View {
 
   /**
    * Compiles an event listener configuration by resolving the target element and setting default values.
-   * @param {EventListenerConfig} [config] - The configuration to compile.
+   * Supports both positional arguments `(target, event, callback, options)` and single object argument `{ target, event, callback, options }`.
+   * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
+   * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
+   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {EventOptions} [options] - Additional listener options.
    * @returns {{ target: HTMLElement | Window, event: string, callback: (this: Element, ev: Event) => any, options: EventOptions }} The compiled and normalized event listener configuration.
    */
-  #compileConfig(config) {
+  #compileConfig(configOrTarget, eventOrCallback, callback, options = {}) {
+    // 1. Omitted target, listening directly on this.scope: listen('click', fn, options)
+    if (typeof configOrTarget === 'string' && typeof eventOrCallback === 'function') {
+      return {
+        target: this.scope,
+        event: configOrTarget,
+        callback: eventOrCallback,
+        options: typeof callback === 'object' && callback !== null ? callback : options,
+      };
+    }
+
+    // 2. Positional: listen('name' | element, 'click', fn, options)
+    if (typeof eventOrCallback === 'string' && typeof callback === 'function') {
+      return {
+        target: this.#resolveTarget(configOrTarget),
+        event: eventOrCallback,
+        callback,
+        options,
+      };
+    }
+
+    // 3. Object config: listen({ target, event, callback, options })
+    const config = /**@type {EventListenerConfig | undefined} */ (configOrTarget);
     return {
-      target: ((config?.target instanceof HTMLElement || config?.target === window ? /** @type {HTMLElement | Window} */ (config?.target) : this.get(config?.target)) ?? this.scope),
+      target: this.#resolveTarget(config?.target),
       event: config?.event ?? 'oloEvent',
       callback: config?.callback ?? (() => {}),
       options: config?.options ?? {},
+    };
+  }
+
+  /**
+   * Resolves a target parameter to an HTMLElement or Window within the scope.
+   * @param {any} [target]
+   * @returns {HTMLElement | Window}
+   */
+  #resolveTarget(target) {
+    if (target && (target instanceof HTMLElement || target === window)) {
+      return target;
     }
+    if (typeof target === 'string') {
+      return this.get(target) ?? this.scope;
+    }
+    if (target && typeof target === 'object') {
+      return this.get(target) ?? this.scope;
+    }
+    return this.scope;
   }
 
   /**
    * Adds an event listener to a target element.
-   * @param {EventListenerConfig} [config] - The configuration for the event listener.
+   * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
+   * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
+   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {EventOptions} [options] - Additional options.
    * @returns {HTMLElement | Window} The target element the listener was attached to.
    */
-  listen(config) {
-    const eventConfig = this.#compileConfig(config);
+  listen(configOrTarget, eventOrCallback, callback, options) {
+    const eventConfig = this.#compileConfig(configOrTarget, eventOrCallback, callback, options);
 
     eventConfig.target.addEventListener(
       eventConfig.event,
@@ -151,11 +199,14 @@ export class Events extends View {
 
   /**
    * Removes an event listener from a target element.
-   * @param {EventListenerConfig} [config] - The configuration for the event listener to remove.
+   * @param {EventListenerConfig | string | HTMLElement | Window} [configOrTarget] - The configuration object, target element, selector name, or event name.
+   * @param {string | ((this: Element, ev: Event) => any)} [eventOrCallback] - The event name or callback function.
+   * @param {((this: Element, ev: Event) => any)} [callback] - The event callback if positional arguments are used.
+   * @param {EventOptions} [options] - Additional options.
    * @returns {HTMLElement | Window} The target element the listener was removed from.
    */
-  unlisten(config) {
-    const eventConfig = this.#compileConfig(config);
+  unlisten(configOrTarget, eventOrCallback, callback, options) {
+    const eventConfig = this.#compileConfig(configOrTarget, eventOrCallback, callback, options);
 
     eventConfig.target.removeEventListener(eventConfig.event, eventConfig.callback);
     return eventConfig.target;

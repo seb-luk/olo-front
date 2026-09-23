@@ -1,12 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { Children } from './children.js';
 import { Component } from './component.js';
 import { Elements } from './elements.js';
-import { State } from './state.js';
-import { Mode } from './mode.js';
-import { Children } from './children.js';
-import { Meta } from './meta.js';
 import { Events } from './events.js';
+import { Meta } from './meta.js';
+import { Mode } from './mode.js';
 import { Router } from './router.js';
+import { State } from './state.js';
 
 describe('Component', () => {
   beforeEach(() => {
@@ -152,5 +153,40 @@ describe('Component', () => {
     expect(comp.state.mode).toEqual(['active']);
     comp.ready.catch(() => {});
     comp.destroy();
+  });
+
+  it('should proxy events.listen and unlisten via on() and off()', async () => {
+    const root = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.dataset.oloName = 'actionBtn';
+    root.appendChild(btn);
+
+    const comp = new Component({ component: 'test-comp' }, { rootElement: root }, getDependencies());
+    await comp.initialized;
+
+    const btnCallback = vi.fn();
+    const rootCallback = vi.fn();
+
+    // Listen with string target name
+    comp.on('actionBtn', 'click', btnCallback);
+    // Listen directly on scope/root
+    comp.on('click', rootCallback);
+
+    btn.click();
+    expect(btnCallback).toHaveBeenCalledTimes(1);
+    expect(rootCallback).toHaveBeenCalledTimes(1);
+
+    // Unlisten using off()
+    comp.off('actionBtn', 'click', btnCallback);
+    btn.click();
+    expect(btnCallback).toHaveBeenCalledTimes(1);
+    expect(rootCallback).toHaveBeenCalledTimes(2);
+
+    comp.ready.catch(() => {});
+    comp.destroy();
+
+    // After destroy, listeners should be stopped via AbortController
+    btn.click();
+    expect(rootCallback).toHaveBeenCalledTimes(2);
   });
 });

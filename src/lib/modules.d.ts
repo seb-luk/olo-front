@@ -41,7 +41,7 @@ export interface ViewModule {
    * @returns The first matching element, or null if none found.
    */
   get?: (
-    selector: Selector | { [key: string]: string | undefined },
+    selector: Selector | { [key: string]: string | undefined } | string,
     options?: { scope?: HTMLElement; tag?: string },
   ) => HTMLElement | null;
 
@@ -57,11 +57,12 @@ export interface ViewModule {
   ) => HTMLElement[];
 
   /**
-   * Compiles an element or partial selector into a normalized Selector object.
-   * @param element - The DOM element or selector to compile.
+   * Compiles an element, string name, or partial selector into a normalized Selector object.
+   * @param element - The DOM element, string name, or selector to compile.
+   * @param options - Additional compilation options.
    * @returns The compiled Selector.
    */
-  compileSelector?: (element: HTMLElement | Selector) => Selector;
+  compileSelector?: (element: HTMLElement | Selector | string, options?: { includeTag?: boolean }) => Selector;
 }
 
 // ============================================================================
@@ -532,6 +533,28 @@ export interface ComponentModule extends Selector, Module {
   /** The events module bound to this component's scope. */
   events?: EventsModule;
 
+  /**
+   * Adds an event listener within the component's scope via the Events module.
+   * Proxies to this.events.listen with automatic lifecycle teardown on destroy.
+   */
+  on?: (
+    target?: EventListenerConfig | string | HTMLElement | Window,
+    eventOrCallback?: string | ((this: Element, ev: Event) => any),
+    callback?: ((this: Element, ev: Event) => any),
+    options?: EventOptions,
+  ) => HTMLElement | Window | undefined;
+
+  /**
+   * Removes an event listener from a target element within the component's scope.
+   * Proxies to this.events.unlisten.
+   */
+  off?: (
+    target?: EventListenerConfig | string | HTMLElement | Window,
+    eventOrCallback?: string | ((this: Element, ev: Event) => any),
+    callback?: ((this: Element, ev: Event) => any),
+    options?: EventOptions,
+  ) => HTMLElement | Window | undefined;
+
   /** Lifecycle hook invoked after the component is mounted in the DOM. */
   onReady: () => void | Promise<void>;
   /** Lifecycle hook invoked after initial state and view setup. */
@@ -582,17 +605,35 @@ export interface EventListenerConfig {
 export interface EventsModule extends ViewModule {
   /**
    * Attaches an event listener to the target element.
-   * @param listener - Event listener configuration.
+   * Supports positional arguments `(target, event, callback, options)` or config object.
+   * @param configOrTarget - Event listener configuration, target element, selector name, or event name.
+   * @param eventOrCallback - Event name or callback function.
+   * @param callback - Event callback if positional arguments are used.
+   * @param options - Additional listener options.
    * @returns The target element or window the listener was attached to.
    */
-  listen?: (listener?: EventListenerConfig) => HTMLElement | Window;
+  listen?: (
+    configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
+    eventOrCallback?: string | ((this: Element, ev: Event) => any),
+    callback?: ((this: Element, ev: Event) => any),
+    options?: EventOptions,
+  ) => HTMLElement | Window;
 
   /**
    * Removes an event listener from its target element.
-   * @param listener - Event listener configuration to remove.
+   * Supports positional arguments `(target, event, callback, options)` or config object.
+   * @param configOrTarget - Event listener configuration, target element, selector name, or event name.
+   * @param eventOrCallback - Event name or callback function.
+   * @param callback - Event callback if positional arguments are used.
+   * @param options - Additional listener options.
    * @returns The target element or window the listener was removed from.
    */
-  unlisten?: (listener?: EventListenerConfig) => HTMLElement | Window;
+  unlisten?: (
+    configOrTarget?: EventListenerConfig | string | HTMLElement | Window,
+    eventOrCallback?: string | ((this: Element, ev: Event) => any),
+    callback?: ((this: Element, ev: Event) => any),
+    options?: EventOptions,
+  ) => HTMLElement | Window;
 
   /** Aborts and removes all event listeners registered through this instance. */
   stopAll?: () => void;

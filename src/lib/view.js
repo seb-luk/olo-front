@@ -58,11 +58,16 @@ export class View {
    * Compiles a selector object from an element or an existing selector object.
    * This is useful for creating a reusable selector from a DOM element.
    * @param {HTMLElement | Selector} [element] - The element or selector to compile.
+   * @param {HTMLElement | Selector | string} [element] - The element, selector object, or string name to compile.
    * @param {Object} [options] - Additional options.
    * @param {boolean} [options.includeTag=false] - Whether to include the tag name in the compiled selector.
    * @returns {Selector} The compiled selector object.
    */
   compileSelector(element, { includeTag = false } = {}) {
+    if (typeof element === 'string') {
+      return { name: element };
+    }
+
     const selector = element instanceof HTMLElement
       ? {
       name: element?.dataset.oloName,
@@ -94,7 +99,7 @@ export class View {
   /**
    * Composes a CSS selector string from a properties object.
    * This is a private method.
-   * @param {Object<string, string | undefined> | Selector} properties - The properties to compose the selector from.
+   * @param {Object<string, string | undefined> | Selector | string} properties - The properties to compose the selector from.
    * @returns {string} The composed CSS selector string.
    */
   #composeSelector(properties) {
@@ -154,12 +159,15 @@ export class View {
   /**
    * Checks if the current scope element matches the given selector.
    * This is a private method.
-   * @param {Selector} [selector] - The selector to check against.
+   * @param {Selector | string} [selector] - The selector to check against.
    * @param {Object} [options] - Additional options.
    * @param {HTMLElement} [options.scope] - The scope to check within. Defaults to the view's scope.
    * @returns {HTMLElement | null} The scope element if it matches, otherwise null.
    */
-  #checkScope({ name, component } = {}, { scope = this.scope } = {}) {
+  #checkScope(selector, { scope = this.scope } = {}) {
+    const sel = typeof selector === 'string' ? { name: selector } : selector;
+    const name = sel?.name;
+    const component = sel?.component;
     const nameCheck = !name || scope.dataset?.oloName === name;
     const componentCheck = !component || scope.dataset?.oloComponent === component;
 
@@ -173,6 +181,7 @@ export class View {
   /**
    * Gets a single element that matches the given selector within the view's scope.
    * @param {Object<string, string | undefined> | Selector} [selector] - The selector to search for.
+   * @param {Object<string, string | undefined> | Selector | string} [selector] - The selector to search for.
    * @param {Object} [options] - Additional options.
    * @param {HTMLElement | null} [options.scope] - The scope to search within. Defaults to the view's scope.
    *

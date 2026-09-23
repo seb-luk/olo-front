@@ -41,16 +41,9 @@ export class UserCard extends Component {
     const inputId = this.id('input'); // e.g. "user-12-input"
 
     // Add event listener with automatic cleanup on destroy
-    const editBtn = this.elements.get({ name: 'editBtn' });
-    if (editBtn) {
-      this.events.listen({
-        target: editBtn,
-        event: 'click',
-        callback: () => {
-          this.state.setMode(['EDITING']);
-        },
-      });
-    }
+    this.on('editBtn', 'click', () => {
+      this.state.setMode(['EDITING']);
+    });
   }
 
   // Lifecycle Hook: Invoked when active view/template switches
@@ -67,11 +60,11 @@ export class UserCard extends Component {
 
 ---
 
-## 2. Built-in Instance Properties
+## 2. Built-in Instance Properties & Event Helpers
 
 Inside your component methods, you have access to:
 
-| Property | Type | Description |
+| Property / Method | Type | Description |
 | :--- | :--- | :--- |
 | `this.name` | `string` | Unique instance name (`data-olo-name`) |
 | `this.component` | `string` | Component type identifier (`data-olo-component`) |
@@ -79,6 +72,8 @@ Inside your component methods, you have access to:
 | `this.state` | `StateModule` | Reactive state node managing content, properties, and modes |
 | `this.elements` | `ElementsModule` | Scoped DOM querying, placeholder replacement, and templating |
 | `this.events` | `EventsModule` | Lifecycle-aware event listener manager |
+| `this.on(target, event, fn)` | `Function` | Convenience shorthand for `this.events.listen` with auto-teardown |
+| `this.off(target, event, fn)` | `Function` | Convenience shorthand for `this.events.unlisten` |
 | `this.router` | `RouterModule` | Local router instance (if configured) |
 | `this.ready` | `Promise<Component>` | Resolves when `onReady` completes |
 

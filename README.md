@@ -70,8 +70,8 @@ Copy and paste this snippet into an `index.html` file and serve it with any HTTP
           doubleDisplay: Number(content?.countDisplay ?? 0) * 2,
         }));
 
-        // setContent automatically updates DOM elements matching [data-olo-name]!
-        this.elements.get({ name: 'incrementBtn' })?.addEventListener('click', () => {
+        // Listen to events with automatic teardown on destroy
+        this.on('incrementBtn', 'click', () => {
           const current = Number(this.state.content?.countDisplay ?? 0);
           this.state.setContent({ countDisplay: current + 1 });
         });

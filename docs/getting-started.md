@@ -111,9 +111,8 @@ class CounterComponent extends Component {
       doubleDisplay: Number(content?.countDisplay ?? 0) * 2,
     }));
 
-    // 3. Bind events — calling setContent automatically synchronizes with matching DOM elements!
-    const incrementBtn = this.elements.get({ name: 'incrementBtn' });
-    incrementBtn?.addEventListener('click', () => {
+    // 3. Bind events using this.on() — with automatic lifecycle cleanup on destroy!
+    this.on('incrementBtn', 'click', () => {
       const current = Number(this.state.content?.countDisplay ?? 0);
       this.state.setContent({ countDisplay: current + 1 });
     });

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
 import { Events, OloEvent } from './events.js';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('OloEvent', () => {
   it('should create an OloEvent with action, value, and context', () => {
@@ -86,5 +86,37 @@ describe('Events', () => {
     expect(dispatchedEvent.action).toBe('my-action');
     expect(dispatchedEvent.value).toBe('my-val');
     expect(dispatchedEvent.context.contextProp).toBe(true);
+  });
+
+  it('should support positional arguments ("name", "click", fn) and unlisten', () => {
+    const scope = document.createElement('div');
+    const child = document.createElement('button');
+    child.dataset.oloName = 'actionBtn';
+    scope.appendChild(child);
+
+    const events = new Events({ scope });
+    const callback = vi.fn();
+
+    events.listen('actionBtn', 'click', callback);
+    child.click();
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    events.unlisten('actionBtn', 'click', callback);
+    child.click();
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('should support positional arguments ("click", fn) to listen directly on scope', () => {
+    const scope = document.createElement('div');
+    const events = new Events({ scope });
+    const callback = vi.fn();
+
+    events.listen('click', callback);
+    scope.click();
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    events.unlisten('click', callback);
+    scope.click();
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 });
