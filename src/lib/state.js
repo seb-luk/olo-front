@@ -316,12 +316,12 @@ export class State extends Module {
 
   /**
    * Sets the content for the state and optionally updates the view.
-   * @param {StateContent | HTMLElement} [content] - The content to set.
+   * @param {StateContent | HTMLElement | { dataset?: Record<string, string | undefined> }} [content] - The content to set.
    * @param {SetterOptions} [options] - Options for setting the content, like whether to update the view.
    * @returns {StateContent} The new content.
    */
   setContent(content = {}, { updateView = true, forceUpdate = false } = {}) {
-    const value = /**@type {StateContent} */ (this.executeSetter('content', /**@type {(content: StateContent | HTMLElement) => StateContent} */ (this.#setContent), content, { updateView, forceUpdate }) ?? this.content ?? {});
+    const value = /**@type {StateContent} */ (this.executeSetter('content', /**@type {(content: StateContent | HTMLElement | { dataset?: Record<string, string | undefined> }) => StateContent} */ (this.#setContent), content, { updateView, forceUpdate }) ?? this.content ?? {});
     return value;
   }
 
@@ -362,7 +362,7 @@ export class State extends Module {
 
   /**
    * Sets the properties for the state and optionally triggers effects.
-   * @param {StateProperties | HTMLElement} [properties] - The properties to set.
+   * @param {StateProperties | HTMLElement | { dataset?: Record<string, string | undefined> }} [properties] - The properties to set.
    * @param {SetterOptions} [options] - Options for setting the properties.
    * @returns {StateProperties} The new properties.
    */

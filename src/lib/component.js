@@ -159,7 +159,6 @@ export class Component extends Module {
       this.#events?.stopAll?.();
       this.#router?.unLink?.();
       this.state?.children?.states?.forEach((child) =>  this.state?.children?.remove?.(child));
-      this.#rootElement.replaceWith(value);
     }
 
     this.#rootElement = value;
@@ -182,9 +181,9 @@ export class Component extends Module {
 
     if (this.state) {
       this.state.children?.setElements?.(value);
-      if (this.state.options) {
-        this.state.options.scope = value;
-      }
+      this.state.options = this.state.options ?? {};
+      this.state.options.scope = value;
+      this.state.options.rootElement = value;
     }
   }
 
@@ -382,8 +381,8 @@ export class Component extends Module {
     // define component identifiers
     const component = typeof state === 'string' ? { component: state } : state;
 
-    this.#name = component.name || `${component.component}_${Math.random().toString(36).slice(2)}`;
-    this.#component = component.component ?? COMPONENT_NAME_FALLBACK;
+    this.#component = component.component ?? placeholder?.dataset?.oloComponent ?? rootElement?.dataset?.oloComponent ?? COMPONENT_NAME_FALLBACK;
+    this.#name = component.name || placeholder?.dataset?.oloName || rootElement?.dataset?.oloName || `${this.#component}_${Math.random().toString(36).slice(2)}`;
 
     const rawView = options.view ?? placeholder?.dataset?.oloView ?? rootElement?.dataset?.oloView ?? component.view ?? DEFAULT_VIEW;
     this.#view = this.applyPipes('view', rawView);
@@ -427,6 +426,7 @@ export class Component extends Module {
 
     if (this.state && rootElement) {
       this.state.options = this.state.options ?? {};
+      this.state.options.scope = rootElement;
       this.state.options.rootElement = rootElement;
     }
 
@@ -459,10 +459,16 @@ export class Component extends Module {
 
         if (rootElem) {
           if (placeholder) {
-            this.rootElement = this.#elements?.replacePlaceholder?.(placeholder, rootElem) ?? rootElem;
+            this.rootElement = this.#elements?.replace?.(placeholder, rootElem) ?? rootElem;
           } else {
             this.rootElement = rootElem;
           }
+        }
+
+        if (this.state && this.rootElement) {
+          this.state.options = this.state.options ?? {};
+          this.state.options.scope = this.rootElement;
+          this.state.options.rootElement = this.rootElement;
         }
 
         if (this.state?.content) {
@@ -471,12 +477,21 @@ export class Component extends Module {
 
         const dataset = { ...placeholder?.dataset ?? {}, ...this.rootElement?.dataset ?? {} };
 
+        if (!this.#state && this.dependencies.State && Object.keys(dataset).some(key => key.includes('oloContent') || key.includes('oloProperties'))) {
+          this.#state = new this.dependencies.State(
+            { name: this.#name, component: this.#component, view: this.#view },
+            {},
+            this.dependencies,
+          );
+          this.#state.setComponent?.(/** @type {ComponentModule} */ (/** @type {unknown} */ (this)));
+        }
+
         if (this.state?.content || Object.keys(dataset).some(key => key.includes('oloContent'))) {
-          this.state?.setContent?.(placeholder ?? this.rootElement, { forceUpdate: true });
+          this.state?.setContent?.({ dataset }, { forceUpdate: true });
         }
 
         if (this.state?.properties || Object.keys(dataset).some(key => key.includes('oloProperties'))) {
-          this.state?.setProperties?.(placeholder ?? this.rootElement, { forceUpdate: true });
+          this.state?.setProperties?.({ dataset }, { forceUpdate: true });
         }
 
         if (this.rootElement) {
@@ -521,6 +536,10 @@ export class Component extends Module {
         throw new Error(`View "${pipedView}" for component "${this.component}" could not be found or compiled.`);
       }
 
+      if (this.#rootElement) {
+        this.elements?.replace?.(this.#rootElement, nextRoot);
+      }
+
       this.rootElement = nextRoot;
       this.#view = pipedView;
       if (this.state) {
@@ -548,6 +567,9 @@ export class Component extends Module {
       return /** @type {ComponentModule} */ (/** @type {unknown} */ (this));
     } catch (error) {
       if (this.#rootElement !== previousRoot) {
+        if (this.#rootElement && previousRoot) {
+          this.elements?.replace?.(this.#rootElement, previousRoot);
+        }
         this.rootElement = previousRoot;
       }
 
@@ -616,7 +638,9 @@ export class Component extends Module {
         child.detachComponent?.();
       });
 
-      this.#rootElement?.remove();
+      if (this.#rootElement) {
+        this.elements?.remove?.(this.#rootElement);
+      }
     }
   }
 

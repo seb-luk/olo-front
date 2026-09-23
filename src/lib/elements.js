@@ -75,21 +75,21 @@ export class Elements extends View {
   }
 
   /**
-   * Replaces a placeholder element with a new view (element or collection of elements).
-   * @param {Selector | HTMLElement} placeholder - The placeholder element or its selector.
-   * @param {HTMLElement | HTMLCollection} [view] - The view to insert in place of the placeholder.
+   * Replaces an existing element or placeholder in the DOM with a new element or view.
+   * @param {Selector | HTMLElement} target - The target element or its selector to replace.
+   * @param {HTMLElement | HTMLCollection} [replacement] - The view to insert in place of the target.
    * @returns {HTMLElement | null} - The inserted element, or null if the operation failed.
    */
-  replacePlaceholder(placeholder, view) {
-    if (!view) {
+  replace(target, replacement) {
+    if (!replacement) {
       return null;
     }
 
-    const placeholderEl = placeholder instanceof HTMLElement ? placeholder : this.get(placeholder);
-    const element = /**@type {HTMLElement} */  (view instanceof HTMLCollection ? view[0] : view);
+    const targetEl = target instanceof HTMLElement ? target : this.get(target);
+    const element = /**@type {HTMLElement} */ (replacement instanceof HTMLCollection ? replacement[0] : replacement);
 
-    if (placeholderEl) {
-      placeholderEl.replaceWith(element);
+    if (targetEl) {
+      targetEl.replaceWith(element);
       return element;
     }
 
@@ -148,7 +148,7 @@ export class Elements extends View {
 
       if (placeholder) {
         this.#placeholders[selector.component ?? COMPONENT_NAME_FALLBACK] = placeholder;
-        return this.replacePlaceholder(placeholder, element);
+        return this.replace(placeholder, element);
       }
 
       return this.#insertIntoSiblings(selector, element, parentNode, index);
@@ -173,16 +173,20 @@ export class Elements extends View {
 
   /**
    * Removes an element from the DOM. If it's the last element of its type, it might be replaced by a placeholder.
-   * @param {Selector} selector - The selector for the element to remove.
+   * @param {Selector | HTMLElement} selector - The element or selector to remove.
    * @param {number} [remainingItems] - The number of similar items remaining in the DOM.
    * @returns {HTMLElement | null} - The removed element, or null if it was not found.
    */
   remove(selector, remainingItems) {
-    const target = this.get(selector);
+    const target = selector instanceof HTMLElement ? selector : this.get(selector);
 
     if (target) {
-      if (remainingItems === 0 && this.#placeholders[selector.component ?? COMPONENT_NAME_FALLBACK]) {
-        this.replacePlaceholder(target, this.#placeholders[selector.component ?? COMPONENT_NAME_FALLBACK]);
+      const componentName = selector instanceof HTMLElement
+        ? selector.dataset?.oloComponent ?? COMPONENT_NAME_FALLBACK
+        : selector?.component ?? COMPONENT_NAME_FALLBACK;
+
+      if (remainingItems === 0 && this.#placeholders[componentName]) {
+        this.replace(target, this.#placeholders[componentName]);
       } else {
         target.remove();
       }

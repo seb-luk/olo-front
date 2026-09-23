@@ -190,4 +190,51 @@ describe('Elements', () => {
     
     document.body.removeChild(scope);
   });
+
+  it('should replace an element with a new element using replace()', () => {
+    const parent = document.createElement('div');
+    const oldEl = document.createElement('div');
+    oldEl.dataset.oloName = 'target';
+    oldEl.textContent = 'Old Element';
+    parent.appendChild(oldEl);
+    document.body.appendChild(parent);
+
+    const elements = new Elements(parent);
+    const newEl = document.createElement('span');
+    newEl.textContent = 'New Element';
+
+    // Replace via HTMLElement
+    const result = elements.replace(oldEl, newEl);
+    expect(result).toBe(newEl);
+    expect(parent.contains(oldEl)).toBe(false);
+    expect(parent.contains(newEl)).toBe(true);
+
+    // Replace via Selector
+    const anotherEl = document.createElement('p');
+    newEl.dataset.oloName = 'span-target';
+    const result2 = elements.replace({ name: 'span-target' }, anotherEl);
+    expect(result2).toBe(anotherEl);
+    expect(parent.contains(newEl)).toBe(false);
+    expect(parent.contains(anotherEl)).toBe(true);
+
+    // Handles null / empty replacement gracefully
+    expect(elements.replace(anotherEl, null)).toBeNull();
+
+    document.body.removeChild(parent);
+  });
+
+  it('should remove an element when passed an HTMLElement directly to remove()', () => {
+    const parent = document.createElement('div');
+    const el = document.createElement('div');
+    el.textContent = 'To Remove';
+    parent.appendChild(el);
+    document.body.appendChild(parent);
+
+    const elements = new Elements(parent);
+    const removed = elements.remove(el);
+    expect(removed).toBe(el);
+    expect(parent.contains(el)).toBe(false);
+
+    document.body.removeChild(parent);
+  });
 });

@@ -189,4 +189,86 @@ describe('Component', () => {
     btn.click();
     expect(rootCallback).toHaveBeenCalledTimes(2);
   });
+
+  it('should not call replaceWith on rootElement in rootElement setter', async () => {
+    const root1 = document.createElement('div');
+    const root2 = document.createElement('div');
+    const replaceWithSpy = vi.spyOn(root1, 'replaceWith');
+
+    const comp = new Component({ component: 'test-comp' }, { rootElement: root1 }, getDependencies());
+    await comp.initialized;
+
+    // Setting rootElement directly should NOT call root1.replaceWith()
+    comp.rootElement = root2;
+    expect(replaceWithSpy).not.toHaveBeenCalled();
+    expect(comp.rootElement).toBe(root2);
+
+    comp.ready.catch(() => {});
+    comp.destroy();
+  });
+
+  it('should delegate DOM removal to elements.remove in destroy()', async () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const comp = new Component({ component: 'test-comp' }, { rootElement: root }, getDependencies());
+    await comp.initialized;
+
+    const removeSpy = vi.spyOn(comp.elements, 'remove');
+    comp.ready.catch(() => {});
+    comp.destroy();
+
+    expect(removeSpy).toHaveBeenCalledWith(root);
+    expect(document.body.contains(root)).toBe(false);
+  });
+
+  it('should swap root elements in the DOM when setView is called', async () => {
+    const template = document.createElement('template');
+    template.dataset.oloComponent = 'test-comp';
+    template.dataset.oloView = 'swapped-view';
+    const nextElem = document.createElement('div');
+    nextElem.textContent = 'Swapped Content';
+    template.content.appendChild(nextElem);
+    document.body.appendChild(template);
+
+    const initialRoot = document.createElement('div');
+    initialRoot.textContent = 'Initial Content';
+    document.body.appendChild(initialRoot);
+
+    const comp = new Component({ component: 'test-comp' }, { rootElement: initialRoot }, getDependencies());
+    await comp.initialized;
+
+    const replaceSpy = vi.spyOn(comp.elements, 'replace');
+
+    await comp.setView('swapped-view');
+
+    expect(replaceSpy).toHaveBeenCalledWith(initialRoot, expect.anything());
+    expect(document.body.contains(initialRoot)).toBe(false);
+    expect(comp.rootElement.textContent).toBe('Swapped Content');
+    expect(document.body.contains(comp.rootElement)).toBe(true);
+
+    comp.ready.catch(() => {});
+    comp.destroy();
+  });
+
+  it('should correctly resolve name and component in constructor without undefined prefix', async () => {
+    const comp = new Component({}, {}, getDependencies());
+    expect(comp.component).toBe('DEFAULT');
+    expect(comp.name.startsWith('DEFAULT_')).toBe(true);
+    expect(comp.name.includes('undefined')).toBe(false);
+    comp.ready.catch(() => {});
+    comp.destroy();
+  });
+
+  it('should adopt name and component from placeholder or rootElement dataset in constructor', async () => {
+    const placeholder = document.createElement('div');
+    placeholder.dataset.oloComponent = 'dataset-comp';
+    placeholder.dataset.oloName = 'dataset-name';
+
+    const comp = new Component({}, { placeholder }, getDependencies());
+    expect(comp.component).toBe('dataset-comp');
+    expect(comp.name).toBe('dataset-name');
+    comp.ready.catch(() => {});
+    comp.destroy();
+  });
 });

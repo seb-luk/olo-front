@@ -84,12 +84,12 @@ export interface ElementsModule extends ViewModule {
   normalizeIndex?: (index: Index, length: number, options?: ElementsOptions) => number;
 
   /**
-   * Replaces a placeholder DOM element with a new element or HTML collection.
-   * @param placeholder - The placeholder element or selector.
-   * @param view - The replacement view element or collection.
+   * Replaces an existing element or placeholder in the DOM with a new element or HTML collection.
+   * @param target - The element or selector to replace.
+   * @param replacement - The replacement element or collection.
    * @returns The inserted element, or null on failure.
    */
-  replacePlaceholder?: (placeholder: Selector | HTMLElement, view?: HTMLElement | HTMLCollection) => HTMLElement | null;
+  replace?: (target: Selector | HTMLElement, replacement?: HTMLElement | HTMLCollection) => HTMLElement | null;
 
   /**
    * Inserts an element into the DOM at the specified index or replacing a dynamic placeholder.
@@ -111,11 +111,11 @@ export interface ElementsModule extends ViewModule {
 
   /**
    * Removes an element from the DOM, restoring a cached placeholder if remaining items reach zero.
-   * @param selector - Selector for the element to remove.
+   * @param selector - Selector or HTMLElement to remove.
    * @param remainingItems - Number of sibling items remaining after removal.
    * @returns The removed element, or null if not found.
    */
-  remove?: (selector: Selector, remainingItems?: number) => HTMLElement | null;
+  remove?: (selector: Selector | HTMLElement, remainingItems?: number) => HTMLElement | null;
 
   /**
    * Updates text content or attributes of elements matching the selector.
@@ -857,15 +857,15 @@ export interface StateModule extends Selector, Module {
    * @param options - Setter options controlling view updates and forceUpdate.
    * @returns The updated StateContent.
    */
-  setContent?: (content?: StateContent | HTMLElement, options?: SetterOptions) => StateContent;
+  setContent?: (content?: StateContent | HTMLElement | { dataset?: Record<string, string | undefined> }, options?: SetterOptions) => StateContent;
 
   /**
    * Sets or merges state properties and triggers property effects.
-   * @param properties - Properties map or HTMLElement.
+   * @param properties - Properties map, HTMLElement, or dataset object.
    * @param options - Setter options.
    * @returns The updated StateProperties.
    */
-  setProperties?: (properties?: StateProperties | HTMLElement, options?: SetterOptions) => StateProperties;
+  setProperties?: (properties?: StateProperties | HTMLElement | { dataset?: Record<string, string | undefined> }, options?: SetterOptions) => StateProperties;
 
   /**
    * Binds a ComponentModule instance or identifier to this state.

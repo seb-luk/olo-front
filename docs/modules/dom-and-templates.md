@@ -97,10 +97,10 @@ When rendering dynamic lists or lazy components, HTML can declare placeholders u
 - `data-olo-static="<name>"`: Static content placeholders (SSR pre-renders).
 - `data-olo-dynamic="<name>"`: Dynamic list slots.
 
-### Swapping Placeholders
+### Replacing Elements & Placeholders
 ```javascript
-// Replaces the placeholder element with the new view element
-elements.replacePlaceholder(
+// Replaces an existing element or placeholder with the new view element
+elements.replace(
   { name: 'feed-placeholder' },
   renderedFeedElement
 );

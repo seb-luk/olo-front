@@ -70,7 +70,7 @@ Inside your component methods, you have access to:
 | `this.component` | `string` | Component type identifier (`data-olo-component`) |
 | `this.rootElement` | `HTMLElement` | Root element in the DOM for this component |
 | `this.state` | `StateModule` | Reactive state node managing content, properties, and modes |
-| `this.elements` | `ElementsModule` | Scoped DOM querying, placeholder replacement, and templating |
+| `this.elements` | `ElementsModule` | Scoped DOM querying, element replacement, and templating |
 | `this.events` | `EventsModule` | Lifecycle-aware event listener manager |
 | `this.on(target, event, fn)` | `Function` | Convenience shorthand for `this.events.listen` with auto-teardown |
 | `this.off(target, event, fn)` | `Function` | Convenience shorthand for `this.events.unlisten` |
