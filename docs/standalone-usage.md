@@ -61,11 +61,11 @@ function mountDropdown(dropdownEl) {
 Instead of littering your code with `classList.add('loading')`, `classList.remove('loading')`, and worrying about out-of-sync class combinations, drop `Mode` into any UI widget:
 
 ```javascript
-import { Mode, Elements } from 'olo-front';
+import { Mode } from 'olo-front';
 
 const card = document.querySelector('#pricing-card');
 
-// Configure states for billing cycle and currency
+// Configure states for billing cycle and currency (Elements is auto-wired!)
 const pricingMode = new Mode(
   {
     modes: {
@@ -74,8 +74,7 @@ const pricingMode = new Mode(
     },
     current: ['MONTHLY', 'USD'],
   },
-  { selector: card },
-  { Elements }
+  { selector: card }
 );
 
 // Toggle between states

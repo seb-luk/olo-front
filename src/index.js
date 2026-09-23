@@ -6,15 +6,58 @@
  * @module olo-front
  */
 
+// Constants
+import {
+  COMPONENT_CONTENT_SLOT_VALUE,
+  COMPONENT_NAME_FALLBACK,
+  COMPONENT_ROOT_ELEMENT_MARK,
+  DEFAULT_VIEW,
+  PLACEHOLDER_DYNAMIC,
+  PLACEHOLDER_STATIC,
+  ROUTER_STATE_NAME,
+} from './lib/constants.js';
+// Reactivity & State
+import {
+  ContentDatasetPipe,
+  ContentViewEffect,
+  PropertiesDatasetPipe,
+  State,
+} from './lib/state.js';
+import { CurrentViewEffect, Mode } from './lib/mode.js';
+// Events
+import { Events, OloEvent } from './lib/events.js';
+
+import { Children } from './lib/children.js';
 // Core Modules
-export { Component } from './lib/component.js';
-export { ComponentBuilder } from './lib/component-builder.js';
-export { Module } from './lib/module.js';
+import { Component } from './lib/component.js';
+import { ComponentBuilder } from './lib/component-builder.js';
+import { Elements } from './lib/elements.js';
+import { Meta } from './lib/meta.js';
+import { Module } from './lib/module.js';
+// Routing & Meta & Mode
+import { Router } from './lib/router.js';
+// DOM & Templating
+import { View } from './lib/view.js';
+
+// Register default framework dependencies on Module
+Module.dependencies = {
+  Component,
+  ComponentBuilder,
+  Elements,
+  View,
+  State,
+  Mode,
+  Children,
+  Events,
+  Router,
+  Meta,
+};
+
+// Core Modules
+export { Component, ComponentBuilder, Module };
 
 // DOM & Templating
-export { View } from './lib/view.js';
-export { Elements } from './lib/elements.js';
-
+export { View, Elements };
 
 // Reactivity & State
 export {
@@ -22,17 +65,16 @@ export {
   ContentViewEffect,
   ContentDatasetPipe,
   PropertiesDatasetPipe,
-} from './lib/state.js';
-export { Mode, CurrentViewEffect } from './lib/mode.js';
-export { Children } from './lib/children.js';
+  Mode,
+  CurrentViewEffect,
+  Children,
+};
 
 // Events
-export { Events, OloEvent } from './lib/events.js';
+export { Events, OloEvent };
 
 // Routing & Meta & Mode
-export { Router } from './lib/router.js';
-export { Meta } from './lib/meta.js';
-
+export { Router, Meta };
 
 // Constants
 export {
@@ -43,5 +85,4 @@ export {
   PLACEHOLDER_DYNAMIC,
   DEFAULT_VIEW,
   ROUTER_STATE_NAME,
-} from './lib/constants.js';
-
+};

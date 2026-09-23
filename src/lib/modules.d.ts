@@ -340,8 +340,18 @@ export interface ModuleDependencies {
       dependencies?: ModuleDependencies,
     ): ChildrenModule;
   };
+  /** Constructor for ViewModule. */
+  View?: { new (scope?: HTMLElement): ViewModule };
   /** ComponentBuilder module instance. */
   componentBuilder?: ComponentBuilderModule;
+  /** Constructor for ComponentBuilderModule. */
+  ComponentBuilder?: {
+    new (
+      components: (ComponentAssets | string)[],
+      options?: ComponentBuilderOptions,
+      dependencies?: ModuleDependencies,
+    ): ComponentBuilderModule;
+  };
   /** Base Component constructor. */
   Component?: {
     new (

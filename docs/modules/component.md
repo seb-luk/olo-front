@@ -6,10 +6,10 @@ The `Component` class is the central orchestrator in `olo-front`. It brings toge
 
 ## 1. Anatomy of a Component
 
-A component extends `Component` and passes its initial state, options, and injected dependencies to `super()`:
+A component extends `Component` and passes its initial state and options to `super()` (companion dependencies like `Elements`, `State`, and `Events` are auto-wired by default via `Module.dependencies`):
 
 ```javascript
-import { Component, Elements, State, Events } from 'olo-front';
+import { Component } from 'olo-front';
 
 export class UserCard extends Component {
   constructor(rootElement, initialUser = {}) {
@@ -30,9 +30,8 @@ export class UserCard extends Component {
       // 2. Component Options
       {
         rootElement,
-      },
-      // 3. Injected Dependencies
-      { Elements, State, Events }
+      }
+      // 3. Dependencies are optional — default dependencies are auto-wired via Module.dependencies!
     );
   }
 
@@ -44,8 +43,12 @@ export class UserCard extends Component {
     // Add event listener with automatic cleanup on destroy
     const editBtn = this.elements.get({ name: 'editBtn' });
     if (editBtn) {
-      this.events.add(editBtn, 'click', () => {
-        this.state.setMode(['EDITING']);
+      this.events.listen({
+        target: editBtn,
+        event: 'click',
+        callback: () => {
+          this.state.setMode(['EDITING']);
+        },
       });
     }
   }

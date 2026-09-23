@@ -17,7 +17,7 @@
 
 - 🌿 **Zero Runtime Dependencies**: Pure ECMAScript and native DOM APIs. No polyfill bloat.
 - ⚡ **Buildless Ready**: Native ES modules with `.js` imports. Run directly in modern browsers without Webpack, Vite, or node_modules.
-- 🎯 **Light DOM & Standard `<template>`**: Avoids Shadow DOM overhead. Components render directly into standard HTML with deterministic `data-olo-*` scoping.
+- 🎯 **Declarative Light DOM Sync**: Avoids Shadow DOM overhead. State `content` properties automatically synchronize to matching `data-olo-name` elements without manual DOM queries or virtual DOM diffing.
 - 🔄 **Explicit Reactivity (Pipes & Effects)**: No hidden proxies or dirty checking. Transform inputs with **Pipes** and apply updates with **Effects**.
 - 🧹 **Automatic Teardown via `AbortController`**: Event listeners bound through `Events` are aborted automatically on `destroy()`, preventing memory leaks.
 - 🚦 **UI Finite State Machine (`Mode`)**: Reflects UI states (e.g. `loading`, `disabled`, `dark`) straight to `data-olo-mode` for clean, classless CSS styling.
@@ -51,38 +51,30 @@ Copy and paste this snippet into an `index.html` file and serve it with any HTTP
 
   <!-- Import directly via native ESM from CDN (or from 'olo-front' if using a bundler) -->
   <script type="module">
-    import { Component, Elements, State } from 'https://esm.sh/olo-front';
+    import { Component } from 'https://esm.sh/olo-front';
 
     class CounterComponent extends Component {
       constructor(rootElement) {
         super(
-          { name: 'counter', component: 'counter', properties: { count: 0 } },
-          { rootElement },
-          { Elements, State }
+          {
+            name: 'counter',
+            component: 'counter',
+            content: { countDisplay: 0, doubleDisplay: 0 },
+          },
+          { rootElement }
         );
 
-        this.countDisplay = this.elements.get({ name: 'countDisplay' });
-        this.doubleDisplay = this.elements.get({ name: 'doubleDisplay' });
-        this.incrementBtn = this.elements.get({ name: 'incrementBtn' });
-
-        // Add a Pipe to automatically compute double the count
-        this.state.addPipe('properties', (props) => ({
-          ...props,
-          doubleCount: Number(props?.count ?? 0) * 2,
+        // Add a Pipe to automatically compute double the count before state commit
+        this.state.addPipe('content', (content) => ({
+          ...content,
+          doubleDisplay: Number(content?.countDisplay ?? 0) * 2,
         }));
 
-        this.incrementBtn?.addEventListener('click', () => {
-          const current = this.state.properties?.count ?? 0;
-          this.state.setProperties({ count: current + 1 });
-          this.render();
+        // setContent automatically updates DOM elements matching [data-olo-name]!
+        this.elements.get({ name: 'incrementBtn' })?.addEventListener('click', () => {
+          const current = Number(this.state.content?.countDisplay ?? 0);
+          this.state.setContent({ countDisplay: current + 1 });
         });
-
-        this.render();
-      }
-
-      render() {
-        if (this.countDisplay) this.countDisplay.textContent = this.state.properties?.count ?? '0';
-        if (this.doubleDisplay) this.doubleDisplay.textContent = this.state.properties?.doubleCount ?? '0';
       }
     }
 

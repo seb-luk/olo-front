@@ -75,15 +75,22 @@ const userState = new State(
 );
 ```
 
-### Updating Content & Properties
+### Updating Content & Declarative DOM Synchronization
+
+In `olo-front`, `State` automatically registers `ContentViewEffect` on `content`. When `setContent` is called on a component state:
 
 ```javascript
-// Updates content and automatically dispatches ContentViewEffect to Elements
+// Automatically locates [data-olo-name="role"] and updates its textContent
 userState.setContent({ role: 'Lead Architect' });
 
-// Updates properties through registered pipes and effects
+// You can also target attributes using the 'name#attr' syntax:
+userState.setContent({ 'avatar#src': '/images/ada.jpg', 'saveBtn#disabled': 'false' });
+
+// Updates properties through registered pipes and effects (business logic)
 userState.setProperties({ isOnline: false });
 ```
+
+Because `setContent` synchronizes directly with matching `data-olo-name` elements in the Light DOM, you don't need manual element querying or an imperative `render()` method!
 
 ### Automatic Dataset Extraction Pipes
 `olo-front` exports built-in pipes that can automatically populate state directly from an HTML element's `data-olo-*` attributes:

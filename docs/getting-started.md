@@ -90,48 +90,33 @@ In `olo-front`, the DOM is the single source of truth for the structure. We anno
 Extend `Component` and configure state, data transformations (pipes), and events:
 
 ```javascript
-import { Component, Elements, State } from 'olo-front';
+import { Component } from 'olo-front';
 
 class CounterComponent extends Component {
   constructor(rootElement) {
-    // 1. Initialize component with state and inject dependencies
+    // 1. Initialize component with state content and scope (dependencies are auto-wired)
+    // Keys in `content` automatically map to elements with matching `data-olo-name`!
     super(
-      { name: 'counter', component: 'counter', properties: { count: 0 } },
-      { rootElement },
-      { Elements, State }
+      {
+        name: 'counter',
+        component: 'counter',
+        content: { countDisplay: 0, doubleDisplay: 0 },
+      },
+      { rootElement }
     );
 
-    // 2. Query scoped DOM elements via this.elements
-    this.countDisplay = this.elements.get({ name: 'countDisplay' });
-    this.doubleDisplay = this.elements.get({ name: 'doubleDisplay' });
-    this.incrementBtn = this.elements.get({ name: 'incrementBtn' });
-
-    // 3. Register a Pipe to transform state properties before commit
-    this.state.addPipe('properties', (props) => ({
-      ...props,
-      doubleCount: Number(props?.count ?? 0) * 2,
+    // 2. Register a Pipe to transform content before it is committed to state and the DOM
+    this.state.addPipe('content', (content) => ({
+      ...content,
+      doubleDisplay: Number(content?.countDisplay ?? 0) * 2,
     }));
 
-    // 4. Bind events (tied automatically to component lifecycle)
-    if (this.incrementBtn) {
-      this.incrementBtn.addEventListener('click', () => {
-        const currentCount = this.state.properties?.count ?? 0;
-        this.state.setProperties({ count: currentCount + 1 });
-        this.render();
-      });
-    }
-
-    // Initial render
-    this.render();
-  }
-
-  render() {
-    if (this.countDisplay) {
-      this.countDisplay.textContent = this.state.properties?.count ?? '0';
-    }
-    if (this.doubleDisplay) {
-      this.doubleDisplay.textContent = this.state.properties?.doubleCount ?? '0';
-    }
+    // 3. Bind events — calling setContent automatically synchronizes with matching DOM elements!
+    const incrementBtn = this.elements.get({ name: 'incrementBtn' });
+    incrementBtn?.addEventListener('click', () => {
+      const current = Number(this.state.content?.countDisplay ?? 0);
+      this.state.setContent({ countDisplay: current + 1 });
+    });
   }
 }
 
@@ -148,9 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ## 3. Key Concepts in this Example
 
-1. **Explicit Reactivity via Pipes**: Notice `state.addPipe('properties', ...)`. When `setProperties` is called, `olo-front` runs your pipeline functions to compute or sanitize values before updating state.
-2. **Light-DOM Scoping**: `this.elements.get({ name: 'countDisplay' })` only searches within `rootElement`, completely avoiding accidental clashes with other elements on the page.
-3. **Zero Virtual DOM**: Updates are directed straight to real DOM nodes (`textContent`), keeping memory usage minimal and avoiding any reconciliation overhead.
+1. **Automatic Content Synchronization**: Notice `content: { countDisplay: 0, doubleDisplay: 0 }`. In `olo-front`, keys in `state.content` automatically synchronize with DOM elements possessing the matching `data-olo-name` attribute whenever `state.setContent()` is called. No manual `render()` method or imperative `textContent` assignments are needed!
+2. **Explicit Reactivity via Pipes**: Notice `state.addPipe('content', ...)`. When `setContent` is called, `olo-front` runs your pipeline functions to compute or sanitize values before committing them to the state and rendering them to the DOM.
+3. **Light-DOM Scoping & Zero Virtual DOM**: Updates are directed straight to real DOM nodes without virtual DOM diffing, keeping memory usage minimal and performance fast.
 
 ---
 

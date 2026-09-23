@@ -64,6 +64,15 @@ state.addEffect('properties', (props, options, deps) => {
 });
 ```
 
+### Automatic Light DOM Synchronization with `ContentViewEffect`
+While you can attach custom effects, `State` comes pre-configured with `ContentViewEffect` for the `content` property. Whenever you call:
+
+```javascript
+state.setContent({ countDisplay: 5, 'submitBtn#disabled': 'false' });
+```
+
+`olo-front` automatically locates elements matching `data-olo-name="countDisplay"` within the component's scope and updates their content (or attributes via `name#attr` syntax) directly. This provides declarative UI updates without virtual DOM diffing or manual querying.
+
 ---
 
 ## 3. Strict Abstraction Boundaries
@@ -95,23 +104,32 @@ class MyComponent extends Component {
 
 ---
 
-## 5. Pluggable Dependency Injection
+## 5. Pluggable Dependency Injection & Inversion of Control
 
-All core modules follow a constructor signature:
+All core modules keep internal concerns strictly decoupled: modules never statically cross-import each other. Instead, they accept optional dependencies:
 
 ```javascript
 constructor(options = {}, dependencies = {})
 ```
 
-Instead of hardcoding references to companion classes, modules receive dependencies explicitly. This allows painless mocking in tests:
+### Auto-Wired Defaults via `Module.dependencies`
+When importing from `olo-front`, the package entry point automatically configures standard companion classes on `Module.dependencies` (`Elements`, `State`, `Events`, `Router`, `Meta`, etc.). You don't need to pass dependencies manually during normal development:
 
 ```javascript
-// Production
-const component = new Component(options, config, { Elements, State, Events });
+// Production: Dependencies are inherited automatically from Module.dependencies
+const component = new Component(state, { rootElement });
+```
 
-// Unit Test with Mock Elements
-const mockElements = { get: vi.fn(), update: vi.fn() };
-const testComponent = new Component(options, config, { Elements: mockElements, State });
+### Mocking in Unit Tests
+Because dependencies are injected, you can painlessly override any dependency per-instance or globally:
+
+```javascript
+// Per-instance override in Vitest:
+const mockElements = class MockElements { get() { return null; } };
+const testComponent = new Component(state, config, { Elements: mockElements });
+
+// Or configure global defaults for a test suite:
+Module.dependencies = { Elements: mockElements };
 ```
 
 ---

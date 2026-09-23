@@ -25,7 +25,7 @@ Rendering and updating lists of items dynamically using `<template>` cloning and
 ```
 
 ```javascript
-import { Component, Elements, State, Events } from 'olo-front';
+import { Component, State } from 'olo-front';
 
 class TodoListComponent extends Component {
   async onReady() {
@@ -51,9 +51,7 @@ class TodoListComponent extends Component {
         name: `todo-${id}`,
         component: 'todo-item',
         content: { title },
-      },
-      {},
-      { Elements, State }
+      }
     );
 
     // Insert at the end of the list
@@ -117,7 +115,7 @@ console.log(formState.properties.email); // "user@example.com"
 Handling loading spinners, error alerts, and successful data states declaratively using `Mode`:
 
 ```javascript
-import { Component, Elements, State, Mode } from 'olo-front';
+import { Component } from 'olo-front';
 
 class ProductView extends Component {
   constructor(rootElement) {
@@ -130,8 +128,7 @@ class ProductView extends Component {
           current: ['IDLE'],
         },
       },
-      { rootElement },
-      { Elements, State, Mode }
+      { rootElement }
     );
   }
 
@@ -188,7 +185,7 @@ Hydrate server-rendered HTML without replacing DOM nodes or causing screen flick
 ```
 
 ```javascript
-import { Component, Elements, State, Events, COMPONENT_CONTENT_SLOT_VALUE } from 'olo-front';
+import { Component, COMPONENT_CONTENT_SLOT_VALUE } from 'olo-front';
 
 class ArticleCardComponent extends Component {
   constructor(rootElement) {
@@ -202,8 +199,7 @@ class ArticleCardComponent extends Component {
           author: COMPONENT_CONTENT_SLOT_VALUE,
         },
       },
-      { rootElement },
-      { Elements, State, Events }
+      { rootElement }
     );
   }
 
@@ -211,11 +207,17 @@ class ArticleCardComponent extends Component {
     // Elements extracts the existing text from the HTML into this.state.content
     console.log('Hydrated Title:', this.state.content.title);
 
-    // Attach interactive behavior smoothly
+    // Attach interactive behavior smoothly with automatic teardown
     const btn = this.elements.get({ name: 'bookmarkBtn' });
-    this.events.add(btn, 'click', () => {
-      this.bookmark();
-    });
+    if (btn) {
+      this.events.listen({
+        target: btn,
+        event: 'click',
+        callback: () => {
+          this.bookmark();
+        },
+      });
+    }
   }
 
   bookmark() {

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+
 import { Module } from './module.js';
 
 describe('Module', () => {
@@ -108,5 +109,25 @@ describe('Module', () => {
     expect(m.pipes.score).toEqual([]);
     
     expect(m.removePipe('unknown')).toBeNull();
+  });
+
+  it('should support static Module.dependencies setter and getter, inherited by instances', () => {
+    class DummyElements {}
+    class DummyState {}
+    class CustomState {}
+
+    Module.dependencies = { Elements: DummyElements, State: DummyState };
+    expect(Module.dependencies.Elements).toBe(DummyElements);
+    expect(Module.dependencies.State).toBe(DummyState);
+
+    // Instances created without dependencies should inherit static default dependencies
+    const m = new Module();
+    expect(m.dependencies.Elements).toBe(DummyElements);
+    expect(m.dependencies.State).toBe(DummyState);
+
+    // Instances with explicit dependencies should override defaults
+    const mCustom = new Module({}, { State: CustomState });
+    expect(mCustom.dependencies.Elements).toBe(DummyElements);
+    expect(mCustom.dependencies.State).toBe(CustomState);
   });
 });

@@ -48,6 +48,29 @@ export class Module {
   }
 
   /**
+   * Default dependencies shared across all module instances.
+   * @type {ModuleDependencies}
+   */
+  static #defaultDependencies = {};
+
+  /**
+   * Gets the static default dependencies.
+   * @returns {ModuleDependencies} The current default dependencies.
+   */
+  static get dependencies() {
+    return Module.#defaultDependencies;
+  }
+
+  /**
+   * Sets or merges static default dependencies for all module instances.
+   * @param {ModuleDependencies | undefined} dependencies - The dependencies to set or merge.
+   * @returns {void}
+   */
+  static set dependencies(dependencies) {
+    Module.#defaultDependencies = { ...Module.#defaultDependencies, ...dependencies ?? {} };
+  }
+
+  /**
    * Dependencies available to this module instance.
    * @type {ModuleDependencies}
    */
@@ -79,6 +102,7 @@ export class Module {
     // 2.1: #moduleOptions starts as {}, so spreading it first is redundant.
     this.#moduleOptions = { ...options, selector: { name: options?.selector?.name, component: options?.selector?.component }, currentModule: this };
     this.dependencies = dependencies;
+    this.dependencies = { ...Module.dependencies, ...dependencies ?? {} };
 
     const types = [...options?.properties ?? []];
     types.forEach((prop) => {
